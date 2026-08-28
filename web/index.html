@@ -1,0 +1,169 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EraLang 2.0 — Interactive Web Playground</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --panel: #161b22;
+            --border: #30363d;
+            --accent: #58a6ff;
+            --accent-green: #2ea043;
+            --text: #c9d1d9;
+            --text-bright: #f0f6fc;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; }
+        header { background: var(--panel); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+        .logo { font-size: 1.25rem; font-weight: 700; color: var(--text-bright); display: flex; align-items: center; gap: 8px; }
+        .controls { display: flex; gap: 12px; align-items: center; }
+        select, button { background: var(--panel); color: var(--text-bright); border: 1px solid var(--border); padding: 6px 14px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; }
+        button.primary { background: var(--accent-green); border-color: #2c974b; font-weight: 600; }
+        button.primary:hover { background: #2c974b; }
+        .main-container { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+        .editor-pane, .console-pane { background: var(--bg); display: flex; flex-direction: column; }
+        .pane-header { background: var(--panel); padding: 8px 16px; font-size: 0.85rem; font-weight: 600; border-bottom: 1px solid var(--border); color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
+        textarea { flex: 1; background: transparent; border: none; padding: 16px; color: #7ee787; font-family: "Fira Code", monospace, Consolas; font-size: 14px; line-height: 1.6; resize: none; outline: none; }
+        .console-output { flex: 1; padding: 16px; font-family: "Fira Code", monospace, Consolas; font-size: 14px; line-height: 1.6; color: #58a6ff; overflow-y: auto; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span>🌟</span>
+            <span>EraLang 2.0 Playground</span>
+        </div>
+        <div class="controls">
+            <select id="sampleSelect" onchange="loadSample()">
+                <option value="nulls">1. Zero Nulls (Option&lt;T&gt;)</option>
+                <option value="structs">2. Structs &amp; Enums</option>
+                <option value="physics">3. 3D Physics &amp; DSP Signals</option>
+                <option value="pipelines">4. Functional Pipelines</option>
+                <option value="tensors">5. Native Tensors (@)</option>
+            </select>
+            <button class="primary" onclick="runCode()">▶ Run Code</button>
+        </div>
+    </header>
+    <div class="main-container">
+        <div class="editor-pane">
+            <div class="pane-header">Editor (EraLang 2.0)</div>
+            <textarea id="codeEditor" spellcheck="false"></textarea>
+        </div>
+        <div class="console-pane">
+            <div class="pane-header">Console Output</div>
+            <div class="console-output" id="consoleOutput">Click 'Run Code' to execute.</div>
+        </div>
+    </div>
+
+    <script>
+        const samples = {
+            nulls: `// 1. Zero Nulls & Safe Options
+fn find_user(id: int) -> Option<string> {
+    if id == 101 {
+        return Some("Alice Walker")
+    }
+    return None
+}
+
+let user = find_user(101)
+match user {
+    Some(name) => print("Found User: " + name)
+    None => print("User not found!")
+}
+
+let fallback = find_user(999).unwrap_or("Guest User")
+print("Fallback user: " + fallback)`,
+
+            structs: `// 2. Native Structs and Pattern Matching
+struct Vector3D {
+    x: float,
+    y: float,
+    z: float
+}
+
+enum Mode {
+    Fast,
+    Accurate
+}
+
+let v = Vector3D(1.0, 2.5, 9.8)
+print("Vector Coordinates: (" + to_str(v.x) + ", " + to_str(v.y) + ", " + to_str(v.z) + ")")
+
+let m = Mode.Accurate
+match m {
+    Mode.Fast => print("Running in Fast Mode")
+    Mode.Accurate => print("Running in Accurate High-Precision Mode")
+}`,
+
+            physics: `// 3. Universal Physics & Kinematics
+import physics
+import linalg
+import signal
+
+let mass = 1000.0
+let velocity = 7800.0 // Orbital speed m/s
+let ke = physics.kinetic_energy(mass, velocity)
+print("Kinetic Energy: " + to_str(ke) + " Joules")
+
+let torque = linalg.cross([0.0, 2.0, 0.0], [10.0, 0.0, 5.0])
+print("Torque Vector (r x F):")
+print(torque)`,
+
+            pipelines: `// 4. Functional Pipelines & Method Chaining
+fn is_even(n: int) -> bool { return (n % 2) == 0 }
+fn triple(n: int) -> int { return n * 3 }
+fn add(a: int, b: int) -> int { return a + b }
+
+let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+let result = numbers
+    .filter(is_even)
+    .map(triple)
+    .reduce(add, 0)
+
+print("Sum of tripled evens: " + to_str(result)) // 90`,
+
+            tensors: `// 5. Multidimensional Tensors & Matrix Multiplication
+let A = Tensor.from_array([[1.0, 2.0], [3.0, 4.0]])
+let B = Tensor.from_array([[2.0, 0.0], [1.0, 2.0]])
+let C = A @ B
+
+print("Matrix Product A @ B:")
+print(C)
+print("Mean: " + to_str(C.mean()))`
+        };
+
+        function loadSample() {
+            const key = document.getElementById("sampleSelect").value;
+            document.getElementById("codeEditor").value = samples[key];
+        }
+
+        function runCode() {
+            const out = document.getElementById("consoleOutput");
+            const editorCode = document.getElementById("codeEditor").value;
+            out.textContent = "Executing in EraLang 2.0 Engine (demo mode - local mock)...\n\nNote: Browser playground is a static demo. For real execution run: python era.py run <file> --vm\n\n";
+            setTimeout(() => {
+                const key = document.getElementById("sampleSelect").value;
+                // Demo mock - real execution requires Python backend
+                if (key === "nulls") {
+                    out.textContent += "Found User: Alice Walker\nFallback user: Guest User\n\n[Demo execution completed in 0.002s]";
+                } else if (key === "structs") {
+                    out.textContent += "Vector Coordinates: (1, 2.5, 9.8)\nRunning in Accurate High-Precision Mode\n\n[Demo execution completed in 0.003s]";
+                } else if (key === "physics") {
+                    out.textContent += "Kinetic Energy: 30420000000 Joules\nTorque Vector (r x F):\n[10, 0, -20]\n\n[Demo execution completed in 0.004s]";
+                } else if (key === "pipelines") {
+                    out.textContent += "Sum of tripled evens: 90\n\n[Demo execution completed in 0.003s]";
+                } else if (key === "tensors") {
+                    out.textContent += "Matrix Product A @ B:\nTensor(2x2, [[4.0, 4.0], [10.0, 8.0]])\nMean: 6.5\n\n[Demo execution completed in 0.005s]";
+                } else {
+                    out.textContent += "Code preview (" + editorCode.length + " chars):\n" + editorCode.slice(0,200) + "\n\n[Demo mode - no real VM in browser]";
+                }
+            }, 100);
+        }
+
+        // Initialize with first sample
+        loadSample();
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+﻿// EraLang Pillar: Native Multi-File Modular Imports
+
+import "./math_utils.era" as m
+
+let num = 5
+
+let sq = m.square(num)
+let cb = m.cube(num)
+let fact = m.factorial(num)
+
+print("Number: " + to_str(num))
+print("Square: " + to_str(sq))
+print("Cube: " + to_str(cb))
+print("Factorial: " + to_str(fact))

@@ -1,0 +1,18 @@
+﻿// Actor Channel Benchmark: 1,000 Message Roundtrips
+
+let ch = Chan(2000)
+
+for i in 0..<1000 {
+    ch.send(i)
+}
+
+var sum = 0
+for i in 0..<1000 {
+    let msg = ch.recv()
+    match msg {
+        Some(v) => { sum += v }
+        None => {}
+    }
+}
+
+print("Actor Channel Sum: " + to_str(sum))

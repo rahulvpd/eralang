@@ -1,0 +1,18 @@
+// ==============================================================================
+// 🌟 Example 03: Zero Implicit Coercion & Explicit Conversions
+// ==============================================================================
+// In JavaScript, "5" + 3 gives "53". In Python, "5" * 3 gives "555".
+// In EraLang, implicit type mixing is rejected by the compiler.
+// Conversions must be intentional and explicit!
+
+let a = 42
+let b = 100
+let sum = a + b
+print("Strict Integer Sum: " + to_str(sum))
+
+let float_val = 3.14159
+let rounded = to_int(float_val)
+print("Explicit Float to Int: " + to_str(rounded))
+
+let text = "Score: " + to_str(sum) + " points"
+print(text)

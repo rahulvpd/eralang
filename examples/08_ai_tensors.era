@@ -1,0 +1,26 @@
+// ==============================================================================
+// 🌟 Example 08: AI Native Primitives & Tensors
+// ==============================================================================
+
+print("--- 1. Multi-Dimensional Tensors & Matrix Multiplication (@) ---")
+let A = Tensor.from_array([[1.0, 2.0], [3.0, 4.0]])
+let B = Tensor.from_array([[5.0, 6.0], [7.0, 8.0]])
+
+print("Matrix A:")
+print(A)
+print("Matrix B:")
+print(B)
+
+let C = A @ B
+print("Matrix Product A @ B:")
+print(C)
+print("Sum of all elements in C: " + to_str(C.sum()))
+
+print("\n--- 2. Typed AI Completion Primitive ---")
+let review = "This new programming language is incredibly fast and reliable!"
+let sentiment = ai.complete<Sentiment>("Analyze the sentiment of: " + review)
+
+match sentiment {
+    Ok(val) => print("AI Classified Sentiment: " + val)
+    Err(e)  => print("AI Error: " + e)
+}

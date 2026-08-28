@@ -1,0 +1,23 @@
+﻿// EraLang Pillar: Cryptography, Operating System & Networking
+
+import crypto
+import os
+
+// 1. Cryptography Hashing
+let secret = "EraLang-2026-Secret"
+let hash_256 = crypto.sha256(secret)
+let hash_1 = crypto.sha1(secret)
+let token = crypto.random_token(8)
+let hmac_res = crypto.hmac_sha256("api-key-123", "GET /api/v1/status")
+
+print("Original text: " + secret)
+print("SHA-256 Hash : " + hash_256)
+print("SHA-1 Hash   : " + hash_1)
+print("Random Token : " + token)
+print("HMAC SHA-256 : " + hmac_res)
+
+// 2. OS Environment & Platform
+let current_platform = os.platform()
+let cwd = os.cwd()
+print("OS Platform  : " + current_platform)
+print("Current Dir  : " + cwd)

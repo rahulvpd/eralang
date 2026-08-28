@@ -1,0 +1,8 @@
+﻿// Matrix Multiplication Benchmark: 50x50 Random Tensors
+
+let A = Tensor.randn([50, 50])
+let B = Tensor.randn([50, 50])
+
+let C = A @ B
+let total = C.sum()
+print("Matrix 50x50 Result Sum: " + to_str(total))

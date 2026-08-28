@@ -1,0 +1,29 @@
+// ==============================================================================
+// 🌟 Example 05: Safe Iteration & Half-Open Ranges (0..<n)
+// ==============================================================================
+// Kills off-by-one errors with clean half-open ranges and safe collection iterators.
+
+print("--- 1. Half-Open Range (0..<5) ---")
+for i in 0..<5 {
+    print("Iteration step: " + to_str(i))
+}
+
+print("\n--- 2. Safe Array Iteration ---")
+let fruits = ["Apple", "Banana", "Dragonfruit", "Elderberry"]
+for fruit in fruits {
+    print("Fruit: " + fruit)
+}
+
+print("\n--- 3. Safe Out-of-Bounds Indexing (Returns Option<T>) ---")
+let item_valid = fruits[1]
+let item_invalid = fruits[99]
+
+match item_valid {
+    Some(val) => print("fruits[1] is: " + val)
+    None      => print("fruits[1] is out of bounds")
+}
+
+match item_invalid {
+    Some(val) => print("fruits[99] is: " + val)
+    None      => print("fruits[99] is safely None (No runtime index crash!)")
+}

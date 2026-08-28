@@ -1,0 +1,45 @@
+﻿// EraLang Pillar: Universal Engineering, Physics & Signal Processing
+
+import physics
+import linalg
+import signal
+import math
+
+// 1. Relativistic & Classical Physics
+let mass = 1000.0 // 1,000 kg satellite
+let velocity = 7800.0 // 7.8 km/s orbital speed
+
+let ke = physics.kinetic_energy(mass, velocity)
+let lorentz = physics.lorentz_factor(velocity)
+
+print("=== Physical Mechanics ===")
+print("Orbital Kinetic Energy (Joules): " + to_str(ke))
+print("Relativistic Lorentz Factor gamma: " + to_str(lorentz))
+print("Speed of Light Constant c (m/s) : " + to_str(physics.C))
+
+// 2. 3D Kinematics & Linear Algebra
+let force_vec = [10.0, 0.0, 5.0]
+let lever_arm = [0.0, 2.0, 0.0]
+
+// Torque tau = r x F
+let torque = linalg.cross(lever_arm, force_vec)
+let torque_mag = linalg.norm(torque)
+let work_done = linalg.dot(force_vec, [2.0, 3.0, 4.0])
+
+print("\n=== Robotics & Structural Vectors ===")
+print("Torque Vector (r x F):")
+print(torque)
+print("Torque Magnitude (N*m): " + to_str(torque_mag))
+print("Work Done (F . d) (J) : " + to_str(work_done))
+
+// 3. Digital Signal Processing (DSP) & Spectral Energy
+let waveform = [0.0, 1.0, 0.0, -1.0, 0.0, 1.0, 0.0, -1.0]
+let spectrum = signal.dft(waveform)
+let signal_rms = signal.rms(waveform)
+
+print("\n=== Digital Signal Processing (DSP) ===")
+print("Time-Domain Waveform Samples:")
+print(waveform)
+print("DFT Frequency Spectrum Magnitudes:")
+print(spectrum)
+print("Waveform RMS Power: " + to_str(signal_rms))

@@ -1,0 +1,28 @@
+﻿// EraLang Pillar: Native Structs and Enums with Pattern Matching
+
+struct Point {
+    x: float,
+    y: float
+}
+
+enum Status {
+    Active,
+    Pending,
+    Archived
+}
+
+// Instantiate typed Struct
+let p = Point(10.5, 20.25)
+print("Point Coordinates:")
+print("p.x = " + to_str(p.x))
+print("p.y = " + to_str(p.y))
+
+// Enum matching
+let current_status = Status.Active
+
+match current_status {
+    Status.Active => print("System is running in ACTIVE mode.")
+    Status.Pending => print("System is PENDING.")
+    Status.Archived => print("System is ARCHIVED.")
+    _ => print("Unknown status")
+}

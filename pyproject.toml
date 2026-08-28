@@ -1,0 +1,22 @@
+﻿[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eralang"
+version = "2.0.0"
+authors = [
+  { name="EraLang Core Team", email="maintainers@eralang.org" },
+]
+description = "The AI-Native, Pitfall-Proof Programming Language"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Compilers",
+    "Topic :: Software Development :: Interpreters",
+]
+
+[project.scripts]
+era = "eralang.cli:main"

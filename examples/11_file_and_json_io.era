@@ -1,0 +1,48 @@
+﻿// EraLang Pillar: Standard Library (math, fs, json, time)
+
+import math
+import fs
+import json
+import time
+
+// 1. Math stdlib
+let root = math.sqrt(256.0)
+let power = math.pow(2.0, 8.0)
+print("math.sqrt(256) = " + to_str(root))
+print("math.pow(2, 8) = " + to_str(power))
+
+// 2. JSON stdlib
+let sample_json = "{\"language\": \"EraLang\", \"version\": \"2.0.0\", \"speed\": 100}"
+let parsed = json.parse(sample_json)
+
+match parsed {
+    Ok(data) => {
+        print("JSON successfully parsed!")
+        print("Language: " + to_str(data["language"].unwrap_or("Unknown")))
+        print("Version: " + to_str(data["version"].unwrap_or("0.0")))
+    }
+    Err(err) => {
+        print("Failed to parse JSON: " + err)
+    }
+}
+
+// 3. File System (fs) stdlib
+let temp_file = "era_test_output.txt"
+let write_res = fs.write_file(temp_file, "EraLang 2.0 Standard Library Verification!\nSecond Line.")
+
+match write_res {
+    Ok(success) => {
+        print("File written successfully. Reading back:")
+        let read_res = fs.read_file(temp_file)
+        match read_res {
+            Ok(content) => print(content)
+            Err(e) => print("Read error: " + e)
+        }
+    }
+    Err(e) => print("Write error: " + e)
+}
+
+// 4. Time stdlib
+let t0 = time.now()
+let elapsed = time.elapsed_ms(t0)
+print("Elapsed benchmark time: " + to_str(elapsed) + " ms")

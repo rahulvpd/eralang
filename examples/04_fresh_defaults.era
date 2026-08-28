@@ -1,0 +1,27 @@
+// ==============================================================================
+// 🌟 Example 04: Fresh Default Arguments (Kills the Python Mutable Trap)
+// ==============================================================================
+// In Python:
+//   def add_item(x, acc=[]):
+//       acc.append(x)
+//       return acc
+// Calling add_item(1) then add_item(2) returns [1, 2] due to shared list state!
+//
+// In EraLang, default parameter expressions are re-evaluated FRESH on every call:
+
+fn add_item(val: string, acc: [string] = []) -> [string] {
+    acc.push(val)
+    return acc
+}
+
+let list1 = add_item("First")
+print("Call 1 list:")
+print(list1)
+
+let list2 = add_item("Second")
+print("Call 2 list (Guaranteed fresh instance, not accumulated!):")
+print(list2)
+
+let list3 = add_item("Third")
+print("Call 3 list:")
+print(list3)

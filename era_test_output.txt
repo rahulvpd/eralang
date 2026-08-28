@@ -1,0 +1,2 @@
+EraLang 2.0 Standard Library Verification!
+Second Line.

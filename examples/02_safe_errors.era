@@ -1,0 +1,25 @@
+// ==============================================================================
+// 🌟 Example 02: Zero Unhandled Exceptions (Explicit Result<T, E>)
+// ==============================================================================
+// No surprise runtime throws/crashes!
+// Functions that can fail return Result<T, E> (Ok(val) | Err(err)).
+// The compiler forces exhaustive handling of both success and failure paths.
+
+fn safe_divide(numerator: int, denominator: int) -> Result<int, string> {
+    if denominator == 0 {
+        return Err("Division by zero error: denominator cannot be 0")
+    }
+    return Ok(numerator / denominator)
+}
+
+print("--- 1. Testing Successful Computation ---")
+match safe_divide(100, 5) {
+    Ok(result) => print("100 / 5 = " + to_str(result))
+    Err(msg)   => print("Error: " + msg)
+}
+
+print("\n--- 2. Testing Controlled Error Path ---")
+match safe_divide(100, 0) {
+    Ok(result) => print("100 / 0 = " + to_str(result))
+    Err(msg)   => print("Safely caught: " + msg)
+}

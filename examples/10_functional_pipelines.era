@@ -1,0 +1,41 @@
+﻿// EraLang Pillar: Functional Pipelines & Method Chaining
+
+let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+// 1. Array filter & map
+fn is_even(n: int) -> bool {
+    return (n % 2) == 0
+}
+
+fn double_it(n: int) -> int {
+    return n * 2
+}
+
+let evens = numbers.filter(is_even)
+print("Filtered evens:")
+print(evens)
+
+let doubled = evens.map(double_it)
+print("Doubled evens:")
+print(doubled)
+
+// 2. Reduce sum
+fn add(a: int, b: int) -> int {
+    return a + b
+}
+
+let sum = doubled.reduce(add, 0)
+print("Sum of doubled evens: " + to_str(sum))
+
+// 3. String manipulation pipelines
+let raw_text = "   era,ai,polyglot,safety   "
+let clean = raw_text.trim()
+print("Trimmed: '" + clean + "'")
+
+let tags = clean.split(",")
+print("Split tags:")
+print(tags)
+
+let joined = tags.join(" -> ")
+print("Pipeline joined:")
+print(joined)

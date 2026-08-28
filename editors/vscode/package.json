@@ -1,0 +1,42 @@
+﻿{
+  "name": "eralang-vscode",
+  "displayName": "EraLang — AI-Native & Pitfall-Proof Language",
+  "description": "Official Language Support, Syntax Highlighting, and Snippets for EraLang 2.0",
+  "version": "2.0.0",
+  "publisher": "eralang-community",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "eralang",
+        "aliases": [
+          "EraLang",
+          "era"
+        ],
+        "extensions": [
+          ".era"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "eralang",
+        "scopeName": "source.era",
+        "path": "./syntaxes/era.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "eralang",
+        "path": "./snippets/era.json"
+      }
+    ]
+  }
+}

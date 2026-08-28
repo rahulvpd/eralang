@@ -1,0 +1,44 @@
+﻿name: EraLang CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel pytest
+
+    - name: Run Core Unit Tests
+      run: |
+        python -m unittest tests/test_all.py
+
+    - name: Run Automated Fuzzing & Stress Tests
+      run: |
+        python -m unittest tests/test_fuzz_and_stress.py
+
+    - name: Run Proof-of-Performance (POW) Benchmarks
+      run: |
+        python era.py bench
+
+    - name: Verify All 14 Showcase Examples
+      run: |
+        python -c "import subprocess, glob; [subprocess.run(['python', 'era.py', 'run', ex], check=True) for ex in sorted(glob.glob('examples/*.era')) if 'math_utils' not in ex]"

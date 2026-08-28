@@ -1,0 +1,31 @@
+// ==============================================================================
+// 🌟 Example 07: Concurrency (Channels & Isolated Actors)
+// ==============================================================================
+
+actor Counter {
+    var count = 0
+
+    fn increment() {
+        count += 1
+    }
+
+    fn get_value() -> int {
+        return count
+    }
+}
+
+let counter = Counter()
+counter.increment()
+counter.increment()
+counter.increment()
+print("Actor Counter final state: " + to_str(counter.get_value()))
+
+// Channels for message passing
+let ch = Chan(10)
+ch.send("Message Alpha")
+ch.send("Message Beta")
+
+let msg1 = ch.recv().unwrap_or("Empty")
+let msg2 = ch.recv().unwrap_or("Empty")
+print("Channel received: " + msg1)
+print("Channel received: " + msg2)

@@ -1,0 +1,17 @@
+// ==============================================================================
+// 🌟 Example 06: Zero-Overhead Python Ecosystem Polyglot Bridge
+// ==============================================================================
+// Day-1 access to existing Python packages (math, json, os, numpy, etc.)
+
+import python:math as math
+import python:json as json
+
+let root = math.sqrt(144)
+print("Square root of 144 from Python math: " + to_str(root))
+
+let cosine = math.cos(0.0)
+print("Cosine of 0.0: " + to_str(cosine))
+
+let data = {"language": "EraLang", "status": "Ready"}
+let json_str = json.dumps(data)
+print("Serialized JSON via Python bridge: " + json_str)

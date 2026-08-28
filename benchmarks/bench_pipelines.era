@@ -1,0 +1,25 @@
+﻿// Functional Pipeline Benchmark: 1,000 items Filter -> Map -> Reduce
+
+fn is_even(n: int) -> bool {
+    return (n % 2) == 0
+}
+
+fn triple(n: int) -> int {
+    return n * 3
+}
+
+fn add(a: int, b: int) -> int {
+    return a + b
+}
+
+var items = []
+for i in 0..<1000 {
+    items.push(i)
+}
+
+let result = items
+    .filter(is_even)
+    .map(triple)
+    .reduce(add, 0)
+
+print("Pipeline Result: " + to_str(result))

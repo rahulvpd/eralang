@@ -1,0 +1,33 @@
+// ==============================================================================
+// 🌟 Example 01: Zero Null Pointer Crashes (First-Class Option<T>)
+// ==============================================================================
+// In EraLang, raw 'null' or 'None' does NOT exist in the type system.
+// Any value that might be absent is wrapped in Option<T> (Some(v) | None).
+// The compiler forces you to handle both cases explicitly!
+
+fn find_user(id: int) -> Option<string> {
+    if id == 101 {
+        return Some("Alice Walker")
+    }
+    if id == 102 {
+        return Some("Bob Smith")
+    }
+    return None
+}
+
+print("--- 1. Pattern Matching on Option<T> ---")
+let user_a = find_user(101)
+match user_a {
+    Some(name) => print("Found User 101: " + name)
+    None       => print("User 101 not found!")
+}
+
+let user_b = find_user(999)
+match user_b {
+    Some(name) => print("Found User 999: " + name)
+    None       => print("User 999 not found!")
+}
+
+print("\n--- 2. Safe Fallback with .unwrap_or() ---")
+let fallback_name = find_user(999).unwrap_or("Guest User")
+print("Greeting: Hello, " + fallback_name)
