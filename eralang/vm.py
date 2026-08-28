@@ -176,6 +176,31 @@ class VM:
                     self.stack.append(EraBuiltinFunction("unwrap_or", lambda d: target.unwrap_or(d)))
                 elif isinstance(target, EraResult) and inst.arg == "unwrap_or":
                     self.stack.append(EraBuiltinFunction("unwrap_or", lambda d: target.unwrap_or(d)))
+                else:
+                    # Generic member handling via Evaluator (Tensor sum/mean/transpose, String/Array methods etc)
+                    tmp_env = self.env
+                    ev = None
+                    try:
+                        from .evaluator import Evaluator as _Eval
+                        from .ast_nodes import ExprStmt as _ExprStmt
+                        from .lexer import Lexer as _Lexer
+                        from .parser import Parser as _Parser
+                        ev = _Eval()
+                        ev.global_env = tmp_env
+                        tmp_env.define("__vm_target__", target, is_mutable=False)
+                        src = f"__vm_target__.{inst.arg}"
+                        lex = _Lexer(src, filename="<vm>")
+                        toks = lex.tokenize()
+                        par = _Parser(toks, filename="<vm>")
+                        prog = par.parse()
+                        stmt = prog.statements[0]
+                        if isinstance(stmt, _ExprStmt):
+                            res = ev.eval_expr(stmt.expression, tmp_env)
+                            self.stack.append(res)
+                        else:
+                            raise RuntimeError(f"Cannot resolve member '{inst.arg}' on '{target.type_name()}'")
+                    except Exception as e:
+                        raise RuntimeError(f"VM OP_GET_MEMBER: cannot access '{inst.arg}' on '{target.type_name()}': {e}")
 
             elif op == OpCode.OP_BUILD_ARRAY:
                 count = inst.arg
