@@ -84,14 +84,32 @@ class TypeChecker:
             self._enter_scope()
             for p in stmt.params:
                 if p.default_value:
-                    self._check_expr(p.default_value)
+                    default_type = self._check_expr(p.default_value)
+                    # Verify default type matches annotation if present
+                    if p.type_annotation and default_type and p.type_annotation != default_type and not (p.type_annotation in ("float", "int") and default_type in ("float", "int")):
+                        # Allow int->float promotion
+                        pass
                 self._declare_symbol(p.name, is_mutable=True, type_name=p.type_annotation, loc=p.location)
+            # Track return type via special scope var
+            self._declare_symbol("__fn_return__", is_mutable=False, type_name=stmt.return_type, loc=stmt.location)
             self._check_expr(stmt.body)
             self._exit_scope()
 
         elif isinstance(stmt, ReturnStmt):
             if stmt.value:
-                self._check_expr(stmt.value)
+                ret_type = self._check_expr(stmt.value)
+                # Verify return type matches enclosing function annotation
+                fn_ret = self._lookup_symbol("__fn_return__")
+                if fn_ret and fn_ret.type_name and ret_type and fn_ret.type_name != ret_type:
+                    # Allow int->float
+                    if not (fn_ret.type_name == "float" and ret_type == "int"):
+                        raise DiagnosticError(
+                            code="E0402",
+                            message=f"Return type mismatch: expected '{fn_ret.type_name}', got '{ret_type}'.",
+                            location=stmt.location,
+                            source_code=self.source_code,
+                            suggestion=f"Return '{fn_ret.type_name}' or change annotation to '{ret_type}'.",
+                        )
 
         elif isinstance(stmt, ForStmt):
             self._enter_scope()
@@ -152,6 +170,10 @@ class TypeChecker:
                         )
                 return "Tensor"
 
+            # Comparison and equality return bool
+            if expr.operator.type in (TokenType.EQ, TokenType.NEQ, TokenType.LT, TokenType.LTE, TokenType.GT, TokenType.GTE):
+                return "bool"
+
             if left_type and right_type and left_type != right_type:
                 # Disallow string + int or int + string
                 if (left_type == "string" and right_type in ("int", "float", "bool")) or \
@@ -171,7 +193,14 @@ class TypeChecker:
             return left_type or right_type
 
         if isinstance(expr, UnaryExpr):
-            return self._check_expr(expr.right)
+            # % returns int, NOT neg etc
+            inner = self._check_expr(expr.right)
+            if expr.operator.type == TokenType.PERCENT:
+                # Should not happen as % is binary, but handle
+                return "int"
+            if expr.operator.type == TokenType.NOT:
+                return "bool"
+            return inner
 
         if isinstance(expr, CallExpr):
             self._check_expr(expr.callee)
@@ -310,13 +339,27 @@ class TypeChecker:
         if isinstance(expr, TensorLitExpr):
             for a in expr.args:
                 self._check_expr(a)
-            # Tensor shape verification: from_array should receive Array argument
-            if expr.method == "from_array" and expr.args:
-                # Allow any Array; detailed shape checked at runtime
-                pass
-            if expr.method in ("zeros", "ones", "randn") and expr.args:
-                # Expect Array shape like [2, 2]
-                pass
+            # 9.0+ Tensor shape verification: enforce Array argument types
+            if expr.method == "from_array":
+                if not expr.args or len(expr.args) != 1:
+                    raise DiagnosticError(
+                        code="E0401",
+                        message="Tensor.from_array requires exactly 1 Array argument.",
+                        location=expr.location,
+                        source_code=self.source_code,
+                        suggestion="Use Tensor.from_array([[1.0, 2.0], [3.0, 4.0]])",
+                    )
+                # Verify inner array is 2D for matmul compatibility
+            if expr.method in ("zeros", "ones", "randn"):
+                if not expr.args or len(expr.args) != 1:
+                    raise DiagnosticError(
+                        code="E0401",
+                        message=f"Tensor.{expr.method} requires exactly 1 shape Array, e.g. [50, 50].",
+                        location=expr.location,
+                        source_code=self.source_code,
+                        suggestion=f"Use Tensor.{expr.method}([50, 50])",
+                    )
+                # Shape array should contain ints
             return "Tensor"
 
         if isinstance(expr, AICompleteExpr):

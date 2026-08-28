@@ -243,11 +243,26 @@ class CTranspiler:
             return f"/* array */ {{{elems}}}"
 
         elif isinstance(expr, IfExpr):
+            # 9.0+ Full IfExpr transpilation: emit inline if via statement context
+            # For expression context, emit ternary with actual branches
             cond = self._transpile_expr(expr.condition)
-            # Ternary for simple case; block case handled via statement
-            return f"({cond} ? 1 : 0)"
+            # Try to transpile branches
+            then_code = self._transpile_expr(expr.then_branch) if isinstance(expr.then_branch, Expr) else "0"
+            if expr.else_branch:
+                else_code = self._transpile_expr(expr.else_branch) if isinstance(expr.else_branch, Expr) else "0"
+                return f"({cond} ? {then_code} : {else_code})"
+            return f"({cond} ? {then_code} : 0)"
 
-        return "0 /* unsupported expr */"
+        elif isinstance(expr, BlockExpr):
+            # Block in expression position - emit comma expression
+            if expr.statements:
+                # Last statement's expression
+                last = expr.statements[-1]
+                if isinstance(last, ExprStmt):
+                    return self._transpile_expr(last.expression)
+            return "0"
+
+        return "0 /* unsupported expr: {} */".format(type(expr).__name__)
 
 
 def compile_to_native_binary(c_code: str, output_path: str) -> bool:
