@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use EraLang in your research, systems design, or AI engineering workflows, please cite it as below."
+authors:
+  - family-names: "V P"
+    given-names: "Rahul"
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+title: "EraLang: The AI-Native, Pitfall-Proof Programming Language"
+version: 2.1.0
+date-released: 2026-09-10
+url: "https://github.com/rahulvpd/eralang"
+license: MIT
+keywords:
+  - programming-language
+  - compilers
+  - type-safety
+  - artificial-intelligence
+  - tensor-algebra
+  - bytecode-vm
