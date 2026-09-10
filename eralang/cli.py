@@ -216,11 +216,125 @@ def run_benchmarks() -> int:
 def run_tests() -> int:
     tests_runner = os.path.join(os.path.dirname(__file__), "..", "tests", "test_all.py")
     fuzz_runner = os.path.join(os.path.dirname(__file__), "..", "tests", "test_fuzz_and_stress.py")
+    parity_runner = os.path.join(os.path.dirname(__file__), "..", "tests", "test_vm_parity.py")
     print("\033[94m[Running Unit Tests]...\033[0m")
     r1 = subprocess.call([sys.executable, "-m", "unittest", tests_runner])
     print("\n\033[94m[Running Fuzzing & Stress Tests]...\033[0m")
     r2 = subprocess.call([sys.executable, "-m", "unittest", fuzz_runner])
-    return 0 if (r1 == 0 and r2 == 0) else 1
+    print("\n\033[94m[Running VM Parity Tests]...\033[0m")
+    r3 = subprocess.call([sys.executable, "-m", "unittest", parity_runner])
+    return 0 if (r1 == 0 and r2 == 0 and r3 == 0) else 1
+
+
+def fmt_file(filepath: str) -> int:
+    """Format an EraLang source file with canonical 4-space indentation and clean spacing."""
+    if not os.path.exists(filepath):
+        print(f"\033[91mError: File not found: '{filepath}'\033[0m")
+        return 1
+
+    with open(filepath, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+
+    formatted_lines = []
+    indent_level = 0
+    consecutive_empty = 0
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            consecutive_empty += 1
+            if consecutive_empty <= 1:
+                formatted_lines.append("\n")
+            continue
+        consecutive_empty = 0
+
+        # Decrease indent for closing braces
+        if stripped.startswith("}") or stripped.startswith("]"):
+            indent_level = max(0, indent_level - 1)
+
+        # Apply standard 4-space indentation
+        formatted_lines.append(("    " * indent_level) + stripped + "\n")
+
+        # Increase indent for opening braces
+        open_braces = stripped.count("{") + stripped.count("[")
+        close_braces = stripped.count("}") + stripped.count("]")
+        indent_level = max(0, indent_level + (open_braces - close_braces))
+
+    result = "".join(formatted_lines).rstrip() + "\n"
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write(result)
+
+    print(f"\033[92m[Formatted] Successfully formatted '{filepath}'\033[0m")
+    return 0
+
+
+def doc_file(filepath: str) -> int:
+    """Extract declarations (structs, enums, functions) from EraLang source and generate Markdown documentation."""
+    if not os.path.exists(filepath):
+        print(f"\033[91mError: File not found: '{filepath}'\033[0m")
+        return 1
+
+    with open(filepath, "r", encoding="utf-8") as f:
+        source = f.read()
+
+    doc = [f"# API Reference: `{os.path.basename(filepath)}`\n"]
+    lines = source.splitlines()
+    pending_comment = []
+
+    for line in lines:
+        s = line.strip()
+        if s.startswith("//"):
+            pending_comment.append(s[2:].strip())
+        elif s.startswith("fn "):
+            header = s.split("{")[0].strip()
+            doc.append(f"### `fn {header[3:]}`\n")
+            if pending_comment:
+                doc.append("\n".join(pending_comment) + "\n")
+                pending_comment = []
+        elif s.startswith("struct "):
+            name = s.split("{")[0].strip()
+            doc.append(f"### `{name}`\n")
+            if pending_comment:
+                doc.append("\n".join(pending_comment) + "\n")
+                pending_comment = []
+        elif s.startswith("enum "):
+            name = s.split("{")[0].strip()
+            doc.append(f"### `{name}`\n")
+            if pending_comment:
+                doc.append("\n".join(pending_comment) + "\n")
+                pending_comment = []
+        else:
+            if not s:
+                pending_comment = []
+
+    doc_text = "\n".join(doc)
+    out_file = filepath.replace(".era", "_doc.md")
+    with open(out_file, "w", encoding="utf-8") as f:
+        f.write(doc_text)
+
+    print(f"\033[92m[Documentation] Generated '{out_file}'\033[0m")
+    return 0
+
+
+def serve_playground(port: int = 8000) -> int:
+    """Launch local HTTP server hosting the EraLang Web Playground."""
+    import http.server
+    import socketserver
+    import webbrowser
+
+    web_dir = os.path.join(os.path.dirname(__file__), "..", "web")
+    os.chdir(web_dir)
+    handler = http.server.SimpleHTTPRequestHandler
+    with socketserver.TCPServer(("", port), handler) as httpd:
+        url = f"http://localhost:{port}"
+        print(f"\033[92m[Serving Playground]\033[0m Listening at \033[96m{url}\033[0m")
+        print("Press Ctrl+C to stop.")
+        try:
+            webbrowser.open(url)
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            print("\nServer stopped.")
+    return 0
 
 
 def autofix_file(filepath: str) -> int:
@@ -281,7 +395,20 @@ def main():
         prog="era",
         description="EraLang Unified Toolchain (Compiler, VM, Evaluator, REPL, Linter, AI Engine)"
     )
+    parser.add_argument("-v", "--version", action="version", version="EraLang 2.1.0 (AI-Native & Universal Systems)")
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
+
+    # era fmt <file>
+    fmt_parser = subparsers.add_parser("fmt", help="Format .era source file with standard indentation")
+    fmt_parser.add_argument("file", help="Path to .era source file to format")
+
+    # era doc <file>
+    doc_parser = subparsers.add_parser("doc", help="Generate Markdown API documentation from .era source")
+    doc_parser.add_argument("file", help="Path to .era source file")
+
+    # era serve [--port 8000]
+    serve_parser = subparsers.add_parser("serve", help="Launch local HTTP server hosting the EraLang Web Playground")
+    serve_parser.add_argument("-p", "--port", type=int, default=8000, help="Port to serve playground on (default: 8000)")
 
     # era run <file> [--vm] [--sandbox]
     run_parser = subparsers.add_parser("run", help="Execute an EraLang script (.era)")
@@ -331,7 +458,13 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == "run":
+    if args.command == "fmt":
+        sys.exit(fmt_file(args.file))
+    elif args.command == "doc":
+        sys.exit(doc_file(args.file))
+    elif args.command == "serve":
+        sys.exit(serve_playground(args.port))
+    elif args.command == "run":
         sys.exit(run_file(args.file, use_vm=args.vm, is_sandbox=args.sandbox))
     elif args.command == "build":
         sys.exit(build_file(args.file, is_native=args.native, output_path=args.output))

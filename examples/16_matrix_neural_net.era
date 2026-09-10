@@ -1,0 +1,31 @@
+// examples/16_matrix_neural_net.era
+// Single-Layer Perceptron / Forward Pass using EraLang Native Tensors (@)
+import math
+
+print("--- 1. Initialize Weight Matrices & Biases ---")
+// Input feature vector (1x3): [Hours Studied, Attendance %, Sleep Hours]
+let X = Tensor.from_array([[2.5, 0.85, 7.0]])
+
+// Weight matrix (3x2): hidden layer weights
+let W = Tensor.from_array([
+    [0.4, -0.2],
+    [0.8,  0.5],
+    [-0.1, 0.3]
+])
+
+// Matrix multiplication: Z = X @ W
+let Z = X @ W
+
+print("Input Features (1x3):")
+print(X)
+print("Weight Matrix (3x2):")
+print(W)
+print("Hidden Layer Pre-Activation Z = X @ W (1x2):")
+print(Z)
+
+print("--- 2. Activation Summary ---")
+let mean_activation = Z.mean()
+print("Mean activation: " + to_str(mean_activation))
+
+print("Transposed output:")
+print(Z.transpose())

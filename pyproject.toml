@@ -1,26 +1,85 @@
-﻿[build-system]
-requires = ["setuptools>=61.0"]
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "eralang"
 version = "2.1.0"
 authors = [
-  { name="EraLang Core Team", email="maintainers@eralang.org" },
+  { name = "EraLang Core Team", email = "maintainers@eralang.org" },
 ]
-description = "The AI-Native, Pitfall-Proof Programming Language - 9.0+ Production Ready"
+description = "The AI-Native, Pitfall-Proof Programming Language for Scientific & Universal Systems"
 readme = "README.md"
-requires-python = ">=3.8"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+keywords = [
+  "programming-language",
+  "compiler",
+  "interpreter",
+  "virtual-machine",
+  "bytecode",
+  "typechecker",
+  "ai-native",
+  "tensors",
+  "pratt-parser",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent",
+  "Topic :: Software Development :: Compilers",
+  "Topic :: Software Development :: Interpreters",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = []
+
 [project.optional-dependencies]
+dev = [
+  "pytest>=7.0.0",
+  "pytest-cov>=4.0.0",
+  "ruff>=0.1.0",
+  "black>=23.0.0",
+  "mypy>=1.0.0",
+]
 numpy = ["numpy>=1.20"]
 ai = ["openai>=1.0"]
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
-    "Topic :: Software Development :: Compilers",
-    "Topic :: Software Development :: Interpreters",
+all = [
+  "numpy>=1.20",
+  "openai>=1.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/rahulvpd/eralang"
+Documentation = "https://github.com/rahulvpd/eralang/tree/main/docs"
+Repository = "https://github.com/rahulvpd/eralang.git"
+Issues = "https://github.com/rahulvpd/eralang/issues"
+Changelog = "https://github.com/rahulvpd/eralang/blob/main/CHANGELOG.md"
+Playground = "https://rahulvpd.github.io/eralang/"
 
 [project.scripts]
 era = "eralang.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["eralang*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+select = ["E", "F", "W", "I"]
+ignore = ["E501", "F401"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+[tool.coverage.run]
+source = ["eralang"]
+omit = ["tests/*", "benchmarks/*"]

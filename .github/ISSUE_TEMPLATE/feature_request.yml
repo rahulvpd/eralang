@@ -1,0 +1,30 @@
+name: 🚀 Feature Request / Language RFC
+description: Suggest a new language feature, syntax addition, or standard library module
+labels: ["enhancement", "rfc"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Propose a new feature, syntax enhancement, or standard library improvement for EraLang!
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Motivation
+      description: What limitation or use-case does this proposal address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Syntax / API Design
+      description: Provide code examples of how this would look and feel in EraLang.
+      render: rust
+      value: |
+        // Proposed EraLang code
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Considered Alternatives
+      description: What other solutions or designs did you consider?

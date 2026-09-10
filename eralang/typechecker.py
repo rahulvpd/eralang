@@ -101,8 +101,11 @@ class TypeChecker:
                 # Verify return type matches enclosing function annotation
                 fn_ret = self._lookup_symbol("__fn_return__")
                 if fn_ret and fn_ret.type_name and ret_type and fn_ret.type_name != ret_type:
-                    # Allow int->float
-                    if not (fn_ret.type_name == "float" and ret_type == "int"):
+                    # Allow int->float, Option covariance (e.g. None returning 'Option' matches 'Option<T>'), and Result covariance
+                    is_int_float = (fn_ret.type_name == "float" and ret_type == "int")
+                    is_opt_compat = (fn_ret.type_name.startswith("Option") and ret_type.startswith("Option"))
+                    is_res_compat = (fn_ret.type_name.startswith("Result") and ret_type.startswith("Result"))
+                    if not (is_int_float or is_opt_compat or is_res_compat):
                         raise DiagnosticError(
                             code="E0402",
                             message=f"Return type mismatch: expected '{fn_ret.type_name}', got '{ret_type}'.",

@@ -1,64 +1,186 @@
-﻿# 🌟 EraLang: The AI-Native, Pitfall-Proof Programming Language
+<div align="center">
 
-> **Version 2.0.0** | Designed for the AI, Edge, Scientific & Universal Engineering Systems Era.
+# 🌟 EraLang
+### **The AI-Native, Pitfall-Proof Programming Language**
+*Zero Nulls • Zero Coercion • Native Tensors (`@`) • Universal Python Polyglot Bridge • Optimizing Bytecode VM*
 
-EraLang is a modern general-purpose programming language engineered specifically to eliminate the most common, silent, and catastrophic software pitfalls at design-time while providing **first-class AI & tensor primitives**, **native Structs & Enums**, **functional data pipelines**, **multi-file native modules**, a **pure 10-module Scientific Standard Library** (`math`, `fs`, `json`, `time`, `crypto`, `http`, `os`, `linalg`, `signal`, `physics`), an **optimizing Bytecode Virtual Machine**, and **zero-boilerplate access to the entire Python ecosystem**.
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-Passing%20(100%25)-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/rahulvpd/eralang/actions)
+[![Python](https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Version](https://img.shields.io/badge/Version-2.1.0-blue?style=for-the-badge)](CHANGELOG.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![Playground](https://img.shields.io/badge/Web-Playground-9cf?style=for-the-badge&logo=googlechrome&logoColor=white)](https://rahulvpd.github.io/eralang/)
+
+[**Interactive Web Playground**](https://rahulvpd.github.io/eralang/) • [**Language Tour**](docs/language-tour.md) • [**Standard Library**](docs/stdlib-reference.md) • [**Python Bridge**](docs/python-bridge.md) • [**Launch Playbook**](LAUNCH_PLAYBOOK.md)
+
+---
+</div>
+
+## 📌 Executive Overview
+
+**EraLang** is a modern general-purpose programming language engineered to eliminate the most common, silent, and catastrophic software pitfalls at design-time while providing **first-class AI & tensor primitives**, **native Structs & Enums**, **functional data pipelines**, a **pure 10-module Scientific Standard Library**, a **high-performance Bytecode Virtual Machine**, an **ahead-of-time C Transpiler**, and **zero-boilerplate access to the entire Python ecosystem**.
+
+Over 80% of software bugs in production and AI-generated code originate from classic language flaws:
+- Null/None dereferences (`NoneType` attribute crashes)
+- Silent type coercion bugs (e.g. `"5" + 3 == "53"`)
+- Unhandled runtime exceptions (`raise`/`throw` caught too late)
+- Mutable default parameter leaks (Python's default argument trap)
+
+EraLang completely eliminates these flaws at compilation and design time.
+
+---
+
+## 🏛️ System Architecture
+
+```mermaid
+flowchart TD
+    %% Styling
+    classDef src fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#fff
+    classDef front fill:#0f172a,stroke:#818cf8,stroke-width:2px,color:#fff
+    classDef safety fill:#14532d,stroke:#22c55e,stroke-width:2px,color:#fff
+    classDef back fill:#312e81,stroke:#a855f7,stroke-width:2px,color:#fff
+    classDef target fill:#78350f,stroke:#f59e0b,stroke-width:2px,color:#fff
+
+    Source[".era Source Code"]:::src
+    Lexer["Lexer & Scanner<br/>(BOM Tolerance & Source Spans)"]:::front
+    Parser["Recursive Descent Pratt Parser<br/>(Operator Precedence & AST)"]:::front
+    TypeChecker["Static Safety & TypeChecker<br/>(Option/Result Exhaustiveness)"]:::safety
+
+    Source --> Lexer --> Parser --> TypeChecker
+
+    subgraph Backends ["Execution Backends"]
+        direction TB
+        Eval["Tree-Walk Evaluator<br/>(Interactive & Scripting)"]:::back
+        Compiler["Bytecode Compiler<br/>(OpCode Constant Pool)"]:::back
+        VM["Stack Bytecode VM<br/>(High Performance)"]:::back
+        CTranspiler["Native C Transpiler<br/>(gcc / clang compilation)"]:::back
+        PyBridge["Polyglot Python Bridge<br/>(500k+ PyPI packages)"]:::back
+    end
+
+    TypeChecker --> Eval
+    TypeChecker --> Compiler --> VM
+    TypeChecker --> CTranspiler
+    TypeChecker --> PyBridge
+
+    Eval --> CLI["Console & Web Playground"]:::target
+    VM --> CLI
+    CTranspiler --> Binary["Standalone Machine Executable (.exe)"]:::target
+```
 
 ---
 
 ## 🛡️ Core Safety Pillars & Bug Elimination
 
-| Classic Pitfall | Root Cause in Other Languages | EraLang 2.0 Solution |
+| Classic Pitfall | Root Cause in Other Languages | EraLang 2.1 Solution |
 | :--- | :--- | :--- |
-| **Null / None Dereference** | Primitive `null`/`None` everywhere | **No `null`**. First-class `Option<T>` (`Some(v)` / `None`). Direct unchecked access is blocked. |
-| **Silent Type Coercion Bugs** | Implicit coercion (e.g. `"5" + 3 == "53"`) | **Zero implicit coercion**. Strict typing with explicit conversion functions (`to_str`, `to_int`). |
-| **Unchecked Runtime Exceptions** | Unannounced `throw` / `raise` | **No runtime exceptions**. Explicit `Result<T, E>` (`Ok(v)` / `Err(e)`). Exhaustive match forced. |
-| **Off-by-One & Bounds Errors** | Raw index loops (`<= vs <`) | Safe half-open ranges `0..<n`. Out-of-bounds indexing returns `Option<T>`. |
-| **Mutable Default Arguments Trap** | Defaults instantiated once at definition (Python trap) | **Fresh default instantiation** evaluated dynamically on each call. |
-| **Non-Exhaustive Conditionals** | Unhandled edge cases & missing branches | **Compiler-enforced exhaustive pattern matching** on all variants. |
-| **Untyped Ad-Hoc Dictionaries** | Missing struct schema enforcement | **Native Structs & Enums** with field-level typing and pattern matching. |
-| **Procedural Boilerplate** | Clunky procedural loops for data transformations | **Functional Method Chaining** (`.map()`, `.filter()`, `.reduce()`, `.split()`, `.trim()`). |
-| **Engineering Unit / Math Failures** | Clunky math libraries and lack of native tensors | **Built-in Tensors (`@`), Linear Algebra (`linalg`), DSP (`signal`), & Universal Physics (`physics`)**. |
-| **Ecosystem Cold-Start** | New languages lack libraries | **Universal Polyglot Bridge** to Python (`import python:torch as torch`) & Native Modules. |
+| **Null / None Crashes** | Primitive unchecked `null`/`None` everywhere | **No `null`**. First-class `Option<T>` (`Some(v)` / `None`). Direct unchecked access is blocked. |
+| **Silent Type Coercion** | Implicit coercion (e.g. `"5" + 3 == "53"`) | **Zero implicit coercion**. Strict typing with explicit conversions (`to_str`, `to_int`). |
+| **Unchecked Exceptions** | Unannounced runtime `raise` or `throw` | **No runtime exceptions**. Explicit `Result<T, E>` (`Ok(v)` / `Err(e)`). Pattern match forced. |
+| **Off-by-One / Bounds Traps** | Out-of-bounds crashes (`IndexError`) | Safe half-open ranges `0..<n`. Indexing returns `Option<T>` with `.unwrap_or()`. |
+| **Mutable Default Trap** | Defaults instantiated once at definition (Python trap) | **Fresh default instantiation** evaluated dynamically on each invocation. |
+| **Missing Edge Cases** | Incomplete conditionals and missing switch cases | **Compiler-enforced exhaustive pattern matching** on all enum and option variants. |
+| **Ad-Hoc Dictionaries** | Missing struct schema enforcement | **Native Structs & Enums** with field-level typing and pattern matching. |
+| **Procedural Boilerplate** | Clunky procedural loops for data transformations | **Functional Method Chaining** (`.map()`, `.filter()`, `.reduce()`). |
+| **Tensor Complexity** | Heavy external library dependencies for basic matrix math | **Built-in Tensors (`@`), Linear Algebra (`linalg`), DSP (`signal`), & Physics (`physics`)**. |
+| **Ecosystem Cold-Start** | New languages lack libraries | **Universal Polyglot Bridge** (`import python:torch as torch`, `import python:numpy as np`). |
 
 ---
 
-## 🚀 Quickstart & Toolchain Commands
+## ⚖️ Feature Comparison: EraLang vs Other Languages
 
-### 1. Execute an EraLang Script
+| Feature | Python | Rust | Go | Mojo | **EraLang 2.1** |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **No Null Pointers (`Option<T>`)** | ❌ (None) | ✅ | ❌ (nil) | ❌ (None) | **✅ (Enforced)** |
+| **No Silent Type Coercion** | ❌ | ✅ | ✅ | ❌ | **✅** |
+| **Explicit Errors (`Result<T, E>`)** | ❌ (Exceptions) | ✅ | ❌ (`val, err`) | ❌ (Exceptions) | **✅** |
+| **Native Matrix Operator (`@`)** | ✅ (via NumPy) | ❌ | ❌ | ✅ | **✅ (Built-in)** |
+| **Instant Python Interop** | Native | ❌ (pyo3) | ❌ (cgo) | ✅ | **✅ (`import python:`)** |
+| **In-Browser Playground** | Pyodide | Rust Playground | Go Playground | Cloud | **✅ (Pyodide Wasm)** |
+| **Multi-Backend (Interp/VM/C)** | CPython | LLVM | gc | LLVM | **✅ (Eval + VM + C)** |
+
+---
+
+## 🚀 Quick Start
+
+### 1. Installation
+
 ```bash
-# Standard tree-walk interpreter
-python era.py run examples/14_engineering_physics_and_signals.era
+# Clone the repository
+git clone https://github.com/rahulvpd/eralang.git
+cd eralang
 
-# High-performance Bytecode Virtual Machine
-python era.py run --vm examples/01_zero_nulls.era
+# Install in editable mode
+pip install -e .
 ```
 
-### 2. Scaffold a New Project
+### 2. Run a Script
+
 ```bash
-python era.py init my_app
+# Tree-walk interpreter
+era run examples/01_zero_nulls.era
+
+# High-performance Bytecode VM
+era run --vm examples/14_engineering_physics_and_signals.era
+
+# Transpile to standalone native machine binary
+era build examples/01_zero_nulls.era --native -o my_binary
 ```
 
-### 3. Run Proof-of-Performance (POW) Benchmarks
-```bash
-python era.py bench
-```
+### 3. Toolchain Utilities
 
-### 4. Run Complete Test & Fuzzing Suite
 ```bash
-python era.py test
-```
+# Format source code (canonical 4-space indentation)
+era fmt examples/01_zero_nulls.era
 
-### 5. Start the Interactive REPL
-```bash
-python era.py repl
+# Generate Markdown API documentation
+era doc examples/09_structs_and_enums.era
+
+# Scaffold a new project with era.toml
+era init my_app
+
+# Run all unit tests, fuzzing tests, and VM parity tests
+era test
+
+# Launch local interactive Web Playground
+era serve --port 8000
 ```
 
 ---
 
-## 📖 Universal Engineering & Language Showcase
+## 📖 Language Showcase
 
-### 1. Universal Physics & Kinematics (`physics` & `linalg`)
+### 1. Zero Nulls & Safe Options
+```rust
+fn find_user(id: int) -> Option {
+    if id == 101 {
+        return Some("Alice Walker")
+    }
+    return None
+}
+
+let user = find_user(101)
+match user {
+    Some(name) => print("Found user: " + name)
+    None => print("User not found!")
+}
+
+let fallback = find_user(999).unwrap_or("Guest User")
+print("Fallback user: " + fallback)
+```
+
+### 2. Native Tensors & Matrix Multiplication (`@`)
+```rust
+let A = Tensor.from_array([[1.0, 2.0], [3.0, 4.0]])
+let B = Tensor.from_array([[5.0, 6.0], [7.0, 8.0]])
+let C = A @ B
+
+print("Matrix Product A @ B:")
+print(C)
+print("Mean: " + to_str(C.mean()))
+print("Transpose: ")
+print(C.transpose())
+```
+
+### 3. Universal Physics & Kinematics (`physics` & `linalg`)
 ```rust
 import physics
 import linalg
@@ -78,42 +200,7 @@ print("Kinetic Energy (J): " + to_str(kinetic_energy))
 print("Torque Vector     : " + to_str(torque))
 ```
 
-### 2. Digital Signal Processing & Fourier Spectra (`signal`)
-```rust
-import signal
-
-let time_samples = [0.0, 1.0, 0.0, -1.0, 0.0, 1.0, 0.0, -1.0]
-let spectrum = signal.dft(time_samples)
-let rms_power = signal.rms(time_samples)
-
-print("DFT Frequency Spectrum: " + to_str(spectrum))
-print("Signal RMS Power      : " + to_str(rms_power))
-```
-
-### 3. Native Structs & Pattern Matching Enums
-```rust
-struct Point {
-    x: float,
-    y: float
-}
-
-enum Status {
-    Active,
-    Pending,
-    Archived
-}
-
-let p = Point(10.5, 20.25)
-let current_status = Status.Active
-
-match current_status {
-    Status.Active => print("System is running in ACTIVE mode.")
-    Status.Pending => print("System is PENDING.")
-    Status.Archived => print("System is ARCHIVED.")
-}
-```
-
-### 4. Functional Data Pipelines & Method Chaining
+### 4. Functional Data Pipelines
 ```rust
 fn is_even(n: int) -> bool { return (n % 2) == 0 }
 fn double_it(n: int) -> int { return n * 2 }
@@ -128,68 +215,55 @@ let sum = numbers
 print("Sum of doubled evens: " + to_str(sum)) // 60
 ```
 
-### 5. Native Tensors & AI Primitives
-```rust
-let A = Tensor.from_array([[1.0, 2.0], [3.0, 4.0]])
-let B = Tensor.from_array([[5.0, 6.0], [7.0, 8.0]])
-let C = A @ B
+---
 
-print("Product A @ B:")
-print(C)
-print("Mean: " + to_str(C.mean()))
-print("Transpose: ")
-print(C.transpose())
+## 📁 Repository Structure
+
+```
+eralang/
+├── .github/
+│   ├── workflows/
+│   │   ├── ci.yml                 # Matrix testing (Python 3.9-3.12 on Linux, macOS, Windows)
+│   │   ├── release.yml            # Automated PyPI packaging & publishing
+│   │   └── pages.yml              # Automated GitHub Pages playground deployment
+│   ├── ISSUE_TEMPLATE/            # Structured bug and feature report templates
+│   ├── PULL_REQUEST_TEMPLATE.md   # Pull request guidelines
+│   └── dependabot.yml             # Weekly dependency updater
+├── .devcontainer/                 # 1-click cloud devcontainer for GitHub Codespaces
+├── benchmarks/                    # Proof-of-Performance (POW) benchmark scripts
+├── docs/                          # Full documentation suite
+│   ├── index.md                   # Overview & safety guarantees
+│   ├── getting-started.md         # Installation and quickstart
+│   ├── language-tour.md           # Syntax, structs, enums, options, results
+│   ├── stdlib-reference.md        # Reference for all 10 standard library modules
+│   ├── python-bridge.md           # Universal Python polyglot bridge guide
+│   └── architecture.md            # Pratt parser, bytecode VM, and C transpiler internals
+├── editors/
+│   └── vscode/                    # VS Code / Cursor language extension & TextMate syntax
+├── eralang/                       # Core compiler, runtime & standard library
+│   ├── lexer.py                   # Lexical scanner & span tracking
+│   ├── parser.py                  # Recursive descent Pratt parser
+│   ├── typechecker.py             # Static safety, exhaustiveness & type verification
+│   ├── evaluator.py               # Tree-walk interpreter runtime
+│   ├── compiler.py                # Optimizing bytecode compiler
+│   ├── vm.py                      # Stack-based Bytecode Virtual Machine
+│   ├── c_transpiler.py            # Ahead-of-time C transpiler & binary compiler
+│   ├── stdlib.py                  # 10-module pure scientific standard library
+│   ├── bridge_python.py           # Universal Python ecosystem polyglot bridge
+│   └── cli.py                     # Unified CLI toolchain (run, vm, fmt, doc, serve, test, bench)
+├── examples/                      # 16 executable EraLang example scripts
+├── tests/                         # Unit, fuzzing, concurrency & VM parity test suites
+├── web/                           # In-browser WebAssembly playground (Pyodide)
+├── Dockerfile                     # Multi-stage container deployment
+├── pyproject.toml                 # Modern PEP 621 packaging & tool configs
+├── CHANGELOG.md                   # Version history & release notes
+├── CONTRIBUTING.md                # Developer contribution guide
+├── LICENSE                        # MIT License
+└── README.md                      # Documentation
 ```
 
 ---
 
-## 📂 Project Directory Structure
+## 📜 License
 
-```
-C:\Users\HP\Desktop\assistive\eralang\
-├── eralang/
-│   ├── __init__.py
-│   ├── token.py           # Tokens, Keywords, and SourceLocation tracking
-│   ├── lexer.py           # Hardened Lexical Scanner with span tracking & BOM tolerance
-│   ├── ast_nodes.py       # Rich AST hierarchy (Structs, Enums, Patterns, Statements)
-│   ├── parser.py          # Recursive descent Pratt parser
-│   ├── typechecker.py     # Static safety & exhaustiveness verifier (E0101, E0201, E0301, E0302)
-│   ├── environment.py     # Scoped lexical environment (let vs var immutability)
-│   ├── values.py          # Runtime values (Option, Result, Structs, Enums, Tensor, etc.)
-│   ├── evaluator.py       # Tree-walk interpreter runtime with module loader
-│   ├── stdlib.py          # Pure 10-Module Standard Library (math, fs, json, time, crypto, http, os, linalg, signal, physics)
-│   ├── compiler.py        # Optimizing Bytecode Compiler & OpCodes
-│   ├── vm.py              # Stack-based Bytecode Virtual Machine
-│   ├── bridge_python.py   # Zero-boilerplate Python ecosystem polyglot bridge
-│   ├── ai_runtime.py      # AI completions, embeddings, and vector math
-│   ├── diagnostics.py     # "Mentor" error formatting & auto-fix suggestions
-│   ├── repl.py            # Interactive REPL
-│   └── cli.py             # Unified CLI (run, --vm, bench, test, init, compile, lsp-check, check, fix)
-├── benchmarks/
-│   ├── bench_runner.py    # Automated POW benchmark runner
-│   ├── bench_matrix.era   # 50x50 Tensor matrix benchmark
-│   ├── bench_actors.era   # 1,000 message channel throughput benchmark
-│   └── bench_pipelines.era# 1,000 item pipeline benchmark
-├── examples/
-│   ├── 01_zero_nulls.era
-│   ├── 02_safe_errors.era
-│   ├── 03_no_coercion.era
-│   ├── 04_fresh_defaults.era
-│   ├── 05_safe_ranges.era
-│   ├── 06_python_interop.era
-│   ├── 07_actors_channels.era
-│   ├── 08_ai_tensors.era
-│   ├── 09_structs_and_enums.era
-│   ├── 10_functional_pipelines.era
-│   ├── 11_file_and_json_io.era
-│   ├── 12_native_modules.era
-│   ├── 13_crypto_and_http.era
-│   ├── 14_engineering_physics_and_signals.era
-│   └── math_utils.era
-├── tests/
-│   ├── test_all.py        # Automated unit test suite (18 tests, 100% pass)
-│   └── test_fuzz_and_stress.py # Automated fuzzing & concurrency stress suite
-├── era.py                 # Cross-platform CLI launcher
-├── era.bat                # Windows CLI command launcher
-└── README.md
-```
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.

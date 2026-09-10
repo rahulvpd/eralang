@@ -1,0 +1,53 @@
+name: EraLang CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Test on Python ${{ matrix.python-version }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        python-version: [ "3.9", "3.10", "3.11", "3.12" ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: 'pyproject.toml'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pytest pytest-cov
+
+      - name: Run Core Test Suite
+        run: |
+          python era.py test
+
+      - name: Run VM Parity Test Suite
+        run: |
+          python -m unittest tests/test_vm_parity.py
+
+      - name: Run Benchmarks (Smoke Test)
+        run: |
+          python era.py bench
+
+      - name: Test Examples Execution
+        run: |
+          python era.py run examples/01_zero_nulls.era
+          python era.py run examples/09_structs_and_enums.era
+          python era.py run examples/10_functional_pipelines.era
+          python era.py run examples/14_engineering_physics_and_signals.era
