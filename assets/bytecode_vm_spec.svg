@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgVM" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070a12"/>
+      <stop offset="50%" stop-color="#0c1322"/>
+      <stop offset="100%" stop-color="#080c18"/>
+    </linearGradient>
+
+    <linearGradient id="stackGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+
+    <linearGradient id="activeSlot" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="640" rx="16" fill="url(#bgVM)"/>
+  <rect width="1196" height="636" x="2" y="2" rx="14" fill="none" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- Blueprint Engineering Header -->
+  <text x="40" y="46" font-family="'Fira Code', monospace" font-size="12" font-weight="700" fill="#a855f7" letter-spacing="1.5">
+    VIRTUAL MACHINE HARDWARE EMULATION // MEMORY &amp; REGISTER SPEC
+  </text>
+  <text x="40" y="76" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700" fill="#f8fafc">
+    EraLang Stack-Based Bytecode VM Runtime Architecture
+  </text>
+  <line x1="40" y1="94" x2="1160" y2="94" stroke="#334155" stroke-width="1"/>
+
+  <!-- COLUMN 1: BYTECODE CHUNK & INSTRUCTIONS -->
+  <g transform="translate(40, 120)">
+    <rect width="320" height="480" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <rect width="320" height="36" rx="8" fill="#1e293b"/>
+    <text x="16" y="24" font-family="'Fira Code', monospace" font-size="13" font-weight="700" fill="#38bdf8">
+      1. BYTECODE CHUNK (code[])
+    </text>
+
+    <!-- Instructions List -->
+    <g transform="translate(16, 52)" font-family="'Fira Code', monospace" font-size="12">
+      <text y="20" fill="#64748b">OFFSET   OPCODE         OPERAND</text>
+      <line x1="0" y1="30" x2="288" y2="30" stroke="#334155" stroke-width="1"/>
+      
+      <text y="50" fill="#94a3b8">0x0000   OP_CONSTANT    #0  (1200.0)</text>
+      <text y="75" fill="#94a3b8">0x0003   OP_SET_LOCAL   slot: 0</text>
+      <text y="100" fill="#94a3b8">0x0006   OP_CONSTANT    #1  (7800.0)</text>
+      <text y="125" fill="#94a3b8">0x0009   OP_SET_LOCAL   slot: 1</text>
+      
+      <!-- Current IP Highlight -->
+      <rect x="-6" y="136" width="300" height="26" rx="4" fill="rgba(56, 189, 248, 0.15)" stroke="#38bdf8" stroke-width="1"/>
+      <text y="154" fill="#38bdf8" font-weight="700">➔ 0x000C OP_MATMUL      (@ Tensor)</text>
+      
+      <text y="180" fill="#94a3b8">0x000D   OP_CALL_STDLIB "physics"</text>
+      <text y="205" fill="#94a3b8">0x0010   OP_JUMP_IF_ERR +12 (Result)</text>
+      <text y="230" fill="#94a3b8">0x0013   OP_GET_LOCAL   slot: 2</text>
+      <text y="255" fill="#94a3b8">0x0016   OP_PRINT_STDOUT</text>
+      <text y="280" fill="#94a3b8">0x0017   OP_RETURN      frame</text>
+    </g>
+
+    <!-- Register State -->
+    <g transform="translate(16, 380)">
+      <rect width="288" height="74" rx="6" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+      <text x="12" y="24" font-family="'Fira Code', monospace" font-size="11" font-weight="700" fill="#fbbf24">VM REGISTERS:</text>
+      <text x="12" y="44" font-family="'Fira Code', monospace" font-size="11" fill="#cbd5e1">IP (Instruction Ptr) : 0x000C</text>
+      <text x="12" y="62" font-family="'Fira Code', monospace" font-size="11" fill="#cbd5e1">SP (Stack Pointer)    : 0x0004</text>
+    </g>
+  </g>
+
+  <!-- COLUMN 2: LIFO OPERAND EVALUATION STACK -->
+  <g transform="translate(400, 120)">
+    <rect width="360" height="480" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <rect width="360" height="36" rx="8" fill="#1e293b"/>
+    <text x="16" y="24" font-family="'Fira Code', monospace" font-size="13" font-weight="700" fill="#34d399">
+      2. OPERAND EVALUATION STACK
+    </text>
+
+    <!-- Stack Slots -->
+    <g transform="translate(24, 55)">
+      <!-- Top of stack (TOS) -->
+      <rect y="0" width="312" height="52" rx="6" fill="#065f46" stroke="#10b981" stroke-width="1.5"/>
+      <text x="16" y="22" font-family="'Fira Code', monospace" font-size="11" font-weight="700" fill="#a7f3d0">[SP - 1] TOP OF STACK (TOS)</text>
+      <text x="16" y="40" font-family="'Fira Code', monospace" font-size="12" fill="#ffffff">Tensor&lt;3x2&gt; (Weights W)</text>
+
+      <rect y="64" width="312" height="52" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2"/>
+      <text x="16" y="86" font-family="'Fira Code', monospace" font-size="11" font-weight="600" fill="#38bdf8">[SP - 2] LEFT OPERAND</text>
+      <text x="16" y="104" font-family="'Fira Code', monospace" font-size="12" fill="#ffffff">Tensor&lt;1x3&gt; (Input Features X)</text>
+
+      <rect y="128" width="312" height="52" rx="6" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+      <text x="16" y="150" font-family="'Fira Code', monospace" font-size="11" fill="#94a3b8">[SP - 3] LOCAL CONSTANT</text>
+      <text x="16" y="168" font-family="'Fira Code', monospace" font-size="12" fill="#cbd5e1">Float(7800.0) [Orbit Velocity]</text>
+
+      <rect y="192" width="312" height="52" rx="6" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+      <text x="16" y="214" font-family="'Fira Code', monospace" font-size="11" fill="#94a3b8">[SP - 4] LOCAL VARIABLE</text>
+      <text x="16" y="232" font-family="'Fira Code', monospace" font-size="12" fill="#cbd5e1">Float(1200.0) [Mass kg]</text>
+
+      <rect y="256" width="312" height="52" rx="6" fill="#111827" stroke="#334155" stroke-width="1" stroke-dasharray="4 4"/>
+      <text x="16" y="286" font-family="'Fira Code', monospace" font-size="11" fill="#64748b">[SP - 5] EMPTY STACK SLOT</text>
+    </g>
+
+    <!-- Stack Note -->
+    <g transform="translate(24, 380)">
+      <rect width="312" height="74" rx="6" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+      <text x="12" y="24" font-family="'Fira Code', monospace" font-size="11" font-weight="700" fill="#34d399">MATMUL STACK ACTION:</text>
+      <text x="12" y="44" font-family="'Fira Code', monospace" font-size="11" fill="#cbd5e1">Pops: B = Pop(), A = Pop()</text>
+      <text x="12" y="62" font-family="'Fira Code', monospace" font-size="11" fill="#38bdf8">Pushes: Result C = A @ B (1x2)</text>
+    </g>
+  </g>
+
+  <!-- COLUMN 3: CALL FRAMES & CONSTANT POOL -->
+  <g transform="translate(800, 120)">
+    <rect width="360" height="480" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <rect width="360" height="36" rx="8" fill="#1e293b"/>
+    <text x="16" y="24" font-family="'Fira Code', monospace" font-size="13" font-weight="700" fill="#c084fc">
+      3. CALL FRAMES &amp; CONSTANTS
+    </text>
+
+    <!-- Call Frame Box -->
+    <g transform="translate(20, 52)">
+      <rect width="320" height="150" rx="6" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.2"/>
+      <text x="14" y="26" font-family="'Fira Code', monospace" font-size="12" font-weight="700" fill="#c084fc">ACTIVE CALL FRAME: main()</text>
+      <text x="14" y="52" font-family="'Fira Code', monospace" font-size="11" fill="#e2e8f0">• Return Address: 0x0000 (Exit)</text>
+      <text x="14" y="74" font-family="'Fira Code', monospace" font-size="11" fill="#e2e8f0">• Base Stack Pointer (BP): 0</text>
+      <text x="14" y="96" font-family="'Fira Code', monospace" font-size="11" fill="#e2e8f0">• Local Scope Slots: 4 allocated</text>
+      <text x="14" y="118" font-family="'Fira Code', monospace" font-size="11" fill="#e2e8f0">• Security Isolation: Unrestricted</text>
+    </g>
+
+    <!-- Constant Pool Box -->
+    <g transform="translate(20, 220)">
+      <rect width="320" height="234" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1.2"/>
+      <text x="14" y="26" font-family="'Fira Code', monospace" font-size="12" font-weight="700" fill="#fbbf24">CONSTANT POOL (constants[])</text>
+      
+      <text x="14" y="56" font-family="'Fira Code', monospace" font-size="11" fill="#94a3b8">#0: Float(1200.0) [Mass]</text>
+      <text x="14" y="80" font-family="'Fira Code', monospace" font-size="11" fill="#94a3b8">#1: Float(7800.0) [Velocity]</text>
+      <text x="14" y="104" font-family="'Fira Code', monospace" font-size="11" fill="#94a3b8">#2: String("Orbital Kinetic J: ")</text>
+      <text x="14" y="128" font-family="'Fira Code', monospace" font-size="11" fill="#94a3b8">#3: String("physics")</text>
+      <text x="14" y="152" font-family="'Fira Code', monospace" font-size="11" fill="#94a3b8">#4: FunctionRef(&lt;orbit_calc&gt;)</text>
+      <text x="14" y="176" font-family="'Fira Code', monospace" font-size="11" fill="#94a3b8">#5: StructDef(Point {x, y})</text>
+      <text x="14" y="200" font-family="'Fira Code', monospace" font-size="11" fill="#94a3b8">#6: EnumDef(Status {Active..})</text>
+    </g>
+  </g>
+</svg>

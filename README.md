@@ -77,42 +77,49 @@ $ era run --vm examples/14_engineering_physics_and_signals.era
 
 ---
 
-## 🏛️ System Architecture
+## 🔬 How It Works: The Engineering Blueprint
 
-```mermaid
-flowchart TD
-    %% Styling
-    classDef src fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#fff
-    classDef front fill:#0f172a,stroke:#818cf8,stroke-width:2px,color:#fff
-    classDef safety fill:#14532d,stroke:#22c55e,stroke-width:2px,color:#fff
-    classDef back fill:#312e81,stroke:#a855f7,stroke-width:2px,color:#fff
-    classDef target fill:#78350f,stroke:#f59e0b,stroke-width:2px,color:#fff
+EraLang is engineered with a modular, 5-phase compiler and runtime architecture:
 
-    Source[".era Source Code"]:::src
-    Lexer["Lexer & Scanner<br/>(BOM Tolerance & Source Spans)"]:::front
-    Parser["Recursive Descent Pratt Parser<br/>(Operator Precedence & AST)"]:::front
-    TypeChecker["Static Safety & TypeChecker<br/>(Option/Result Exhaustiveness)"]:::safety
+<div align="center">
+  <img src="assets/compiler_pipeline.svg" alt="EraLang Compiler Pipeline Architecture Blueprint" width="100%" />
+</div>
 
-    Source --> Lexer --> Parser --> TypeChecker
+<br/>
 
-    subgraph Backends ["Three High-Performance Backends"]
-        direction TB
-        Eval["Tree-Walk Evaluator<br/>(Interactive REPL & Scripts)"]:::back
-        Compiler["Bytecode Compiler<br/>(OpCode Constant Pool)"]:::back
-        VM["Stack Bytecode VM<br/>(High-Speed Execution)"]:::back
-        CTranspiler["Ahead-Of-Time C Transpiler<br/>(gcc / clang Machine Binaries)"]:::back
-        PyBridge["Polyglot Python Quad-Bridge<br/>(Instant 500k+ PyPI packages)"]:::back
-    end
+### 1. Lexical Scanner & Span Tracking (`eralang/lexer.py`)
+* **UTF-8 BOM Tolerance:** Automatically skips zero-width Byte Order Marks (`0xFEFF`) across Windows and Unix sources.
+* **Precise Span Mapping:** Every token maintains a `SourceLocation(filename, line, column)` tracking the exact visual span for error diagnostics.
+* **Multi-Char Disambiguation:** Differentiates between `@` (matrix multiply), `..` and `..<` (safe ranges), `=>` (pattern matching), and `->` (return type).
 
-    TypeChecker --> Eval
-    TypeChecker --> Compiler --> VM
-    TypeChecker --> CTranspiler
-    TypeChecker --> PyBridge
+### 2. Recursive Descent Pratt Parser (`eralang/parser.py`)
+* Implements **Vaughan Pratt's Top-Down Operator Precedence** algorithm.
+* Replaces monolithic grammar tables with dynamic binding powers for prefix, infix, and postfix operators.
+* Guarantees that mathematical matrix multiplications (`@`) bind with higher precedence than additions while preserving clean functional pipelines (`.map().filter()`).
 
-    Eval --> CLI["Interactive REPL & Web Playground"]:::target
-    VM --> CLI
-    CTranspiler --> Binary["Standalone Native Binary (.exe / elf)"]:::target
-```
+### 3. Static TypeChecker & Exhaustiveness Matrix (`eralang/typechecker.py`)
+* **Lexical Scope Chaining:** Enforces strict immutable `let` bindings vs mutable `var` declarations.
+* **Option & Result Covariance:** Guarantees that `None` safely typechecks against any `Option<T>` return type, and `Err(e)` against `Result<T, E>`.
+* **Pattern Exhaustiveness:** Rejects code at compile time if an `Option` (`Some`/`None`) or `Result` (`Ok`/`Err`) match arm is left unhandled.
+
+---
+
+## 📟 Inside the Bytecode Virtual Machine (VM)
+
+For maximum execution velocity, EraLang lowers the validated AST into a specialized stack-based virtual machine:
+
+<div align="center">
+  <img src="assets/bytecode_vm_spec.svg" alt="EraLang Bytecode Virtual Machine Blueprint" width="100%" />
+</div>
+
+<br/>
+
+### Execution Mechanics:
+* **The Operand Stack:** A high-speed LIFO array storing immediate values (`EraValue`). Binary operations like `OP_MATMUL` pop right and left matrices, execute BLAS-aligned tensor multiplications, and push the resulting tensor back onto the stack in under **10 microseconds**.
+* **CallFrame Stack:** Each function invocation pushes a lightweight `CallFrame` preserving the instruction pointer (`ip`), base stack pointer (`bp`), and local variable slots.
+* **Zero-Copy Serialization:** Constants (floats, strings, struct schemas) are deduplicated in the `constants[]` pool and accessed via 16-bit integer indexes.
+
+[**📖 Read Full Engineering Specification (docs/how-it-works.md)**](docs/how-it-works.md)
 
 ---
 
