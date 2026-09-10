@@ -450,6 +450,18 @@ print("Euclidean Norm (v1): " + to_str(norm))`
         async function initPyodideEngine() {
             try {
                 pyodide = await loadPyodide();
+
+                // Fetch and unpack real EraLang compiler package into Pyodide virtual filesystem
+                try {
+                    const response = await fetch("eralang.zip");
+                    if (response.ok) {
+                        const buffer = await response.arrayBuffer();
+                        await pyodide.unpackArchive(buffer, "zip", { extractDir: "/home/pyodide" });
+                    }
+                } catch (pkgErr) {
+                    console.warn("Could not unpack eralang.zip:", pkgErr);
+                }
+
                 const statusDot = document.getElementById("pyodideStatus");
                 const statusText = document.getElementById("engineStatusText");
                 statusDot.classList.add("ready");
@@ -459,8 +471,8 @@ print("Euclidean Norm (v1): " + to_str(norm))`
                 // Test runtime and print welcome
                 document.getElementById("consoleOutput").textContent = 
                     "🌟 EraLang 2.1 WebAssembly Runtime Initialized!\n" +
-                    "Select any example above or write your own EraLang code, then click 'Run Code'.\n\n" +
-                    "[Tip: No server required — executes 100% client-side in your browser via WebAssembly.]";
+                    "Select any example above or write your own custom EraLang code, then click 'Run Code'.\n\n" +
+                    "[Tip: Executes 100% client-side in your browser via Pyodide WebAssembly.]";
             } catch (err) {
                 console.error("Pyodide init error:", err);
                 document.getElementById("engineStatusText").textContent = "Wasm Engine Local Mode";
@@ -609,8 +621,10 @@ stdout_capture.getvalue()
                     return;
                 }
             } catch (err) {
-                // Fallback graceful handler for WebAssembly execution
                 console.warn("Wasm dynamic compile note:", err);
+                out.textContent = "Runtime Warning: " + err.message;
+                timer.textContent = "";
+                return;
             }
 
             // High-speed browser mock fallback for preview
